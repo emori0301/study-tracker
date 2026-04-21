@@ -46,7 +46,8 @@ src/
 bun dev              # 開発サーバー起動
 bun build            # ビルド
 bun lint             # ESLint
-bunx prisma migrate dev   # マイグレーション実行
+bunx prisma generate      # Prisma Client 生成
+bunx prisma db push --url "$DIRECT_URL" --accept-data-loss  # スキーマ反映（DIRECT_URLを直接指定すること）
 bunx prisma studio        # DB GUI
 ```
 
