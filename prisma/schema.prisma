@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Subject {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  name      String
+  color     String    @default("#6366f1")
+  icon      String    @default("📚")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  tasks     Task[]
+  sessions  Session[]
+
+  @@map("subjects")
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  subjectId   String    @map("subject_id")
+  userId      String    @map("user_id")
+  title       String
+  completed   Boolean   @default(false)
+  dueDate     DateTime? @map("due_date")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  sessions    Session[]
+
+  @@map("tasks")
+}
+
+model Session {
+  id         String    @id @default(cuid())
+  userId     String    @map("user_id")
+  subjectId  String    @map("subject_id")
+  taskId     String?   @map("task_id")
+  duration   Int
+  date       DateTime  @default(now())
+  createdAt  DateTime  @default(now()) @map("created_at")
+  subject    Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  task       Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@map("sessions")
+}
+
+model Goal {
+  id           String   @id @default(cuid())
+  userId       String   @unique @map("user_id")
+  dailyMinutes Int      @default(120) @map("daily_minutes")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("goals")
+}
