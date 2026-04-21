@@ -21,12 +21,17 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: formData.get("email") as string,
     password: formData.get("password") as string,
   });
 
   if (error) return { error: error.message };
+
+  // メール確認が必要な場合（session が null）
+  if (!data.session) {
+    return { needsConfirmation: true };
+  }
 
   revalidatePath("/", "layout");
   redirect("/");

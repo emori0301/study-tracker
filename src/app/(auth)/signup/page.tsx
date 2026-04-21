@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     const password = formData.get("password") as string;
@@ -25,7 +26,30 @@ export default function SignupPage() {
     if (result?.error) {
       setError(result.error);
       setLoading(false);
+    } else if (result?.needsConfirmation) {
+      setConfirmed(true);
+      setLoading(false);
     }
+  }
+
+  if (confirmed) {
+    return (
+      <Card className="w-full max-w-sm">
+        <CardHeader className="text-center">
+          <div className="text-3xl mb-2">📧</div>
+          <CardTitle className="text-xl">確認メールを送信しました</CardTitle>
+          <CardDescription>
+            登録したメールアドレスの受信ボックスを確認し、
+            メール内のリンクをクリックしてください。
+          </CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Link href="/login" className="w-full">
+            <Button className="w-full">ログインページへ</Button>
+          </Link>
+        </CardFooter>
+      </Card>
+    );
   }
 
   return (
