@@ -33,8 +33,8 @@ export async function getWeeklyStats() {
   return days.map((day) => {
     const next = new Date(day);
     next.setDate(next.getDate() + 1);
-    const daySessions = sessions.filter((s) => s.date >= day && s.date < next);
-    const totalMinutes = daySessions.reduce((sum, s) => sum + s.duration, 0);
+    const daySessions = sessions.filter((s: typeof sessions[number]) => s.date >= day && s.date < next);
+    const totalMinutes = daySessions.reduce((sum: number, s: typeof sessions[number]) => sum + s.duration, 0);
     return {
       date: day.toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" }),
       minutes: totalMinutes,
