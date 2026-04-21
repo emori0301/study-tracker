@@ -31,7 +31,7 @@ function NavIcon({ href, label, icon: Icon, isActive }: {
     <Tooltip>
       <TooltipTrigger
         className={cn(
-          "flex h-10 w-10 items-center justify-center rounded-lg transition-colors",
+          "flex h-10 w-10 items-center justify-center rounded-lg transition-colors cursor-pointer",
           isActive
             ? "bg-primary text-primary-foreground"
             : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -68,7 +68,7 @@ export function Sidebar() {
         <div className="p-2 border-t">
           <Tooltip>
             <TooltipTrigger
-              className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
               onClick={() => logout()}
             >
               <LogOut className="h-5 w-5" />

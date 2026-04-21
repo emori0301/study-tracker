@@ -4,8 +4,6 @@ import { useCallback, useState } from "react";
 import { Play, Pause, RotateCcw } from "lucide-react";
 import { useTimer } from "@/hooks/use-timer";
 import { TimerRing } from "./timer-ring";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -18,15 +16,21 @@ import type { Subject, TimerSettings } from "@/types";
 import type { TimerMode } from "@/types";
 
 const modeLabel: Record<TimerMode, string> = {
-  work: "作業",
+  work:       "作業",
   shortBreak: "休憩",
-  longBreak: "長い休憩",
+  longBreak:  "長い休憩",
 };
 
-const modeBadgeVariant: Record<TimerMode, "default" | "secondary" | "outline"> = {
-  work: "default",
-  shortBreak: "secondary",
-  longBreak: "outline",
+const modeTabActive: Record<TimerMode, string> = {
+  work:       "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40",
+  shortBreak: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40",
+  longBreak:  "bg-sky-500/20 text-sky-300 border border-sky-500/40",
+};
+
+const modeDotActive: Record<TimerMode, string> = {
+  work:       "bg-indigo-400",
+  shortBreak: "bg-emerald-400",
+  longBreak:  "bg-sky-400",
 };
 
 interface TimerContainerProps {
@@ -46,84 +50,100 @@ export function TimerContainer({ subjects, settings }: TimerContainerProps) {
 
   timer.setOnComplete(handleComplete);
 
-  const dots = Array.from({ length: settings.longBreakInterval }, (_, i) => (
-    <span
-      key={i}
-      className={`inline-block h-2 w-2 rounded-full ${
-        i < timer.sessionCount % settings.longBreakInterval
-          ? "bg-primary"
-          : "bg-muted"
-      }`}
-    />
-  ));
-
   return (
-    <div className="flex flex-col items-center gap-6">
-      {/* モード切替 */}
-      <div className="flex gap-2">
-        {(["work", "shortBreak", "longBreak"] as TimerMode[]).map((m) => (
-          <button
-            key={m}
-            onClick={() => timer.switchMode(m)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              timer.mode === m
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
-          >
-            {modeLabel[m]}
-          </button>
-        ))}
-      </div>
+    <div className="w-full max-w-sm">
+      <div className="rounded-2xl border border-white/8 bg-card/60 backdrop-blur-sm shadow-2xl p-8 flex flex-col items-center gap-6">
 
-      {/* リング */}
-      <TimerRing
-        timeLeft={timer.timeLeft}
-        progress={timer.progress}
-        mode={timer.mode}
-        isRunning={timer.isRunning}
-      />
-
-      {/* セッションドット */}
-      <div className="flex items-center gap-2">
-        <Badge variant={modeBadgeVariant[timer.mode]}>{modeLabel[timer.mode]}</Badge>
-        <div className="flex gap-1">{dots}</div>
-        <span className="text-xs text-muted-foreground">
-          {timer.sessionCount} セッション完了
-        </span>
-      </div>
-
-      {/* 科目選択 */}
-      <Select value={subjectId} onValueChange={(v) => setSubjectId(v ?? "")}>
-        <SelectTrigger className="w-60">
-          <SelectValue placeholder="科目を選択（任意）" />
-        </SelectTrigger>
-        <SelectContent>
-          {subjects.map((s) => (
-            <SelectItem key={s.id} value={s.id}>
-              <span className="mr-2">{s.icon}</span>
-              {s.name}
-            </SelectItem>
+        {/* モード切替タブ */}
+        <div className="flex gap-1.5 p-1 rounded-xl bg-white/5 border border-white/8">
+          {(["work", "shortBreak", "longBreak"] as TimerMode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => timer.switchMode(m)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                timer.mode === m
+                  ? modeTabActive[m]
+                  : "text-muted-foreground hover:text-foreground hover:bg-white/5 border border-transparent"
+              }`}
+            >
+              {modeLabel[m]}
+            </button>
           ))}
-        </SelectContent>
-      </Select>
+        </div>
 
-      {/* コントロール */}
-      <div className="flex gap-3">
-        <Button variant="outline" size="icon" onClick={timer.reset}>
-          <RotateCcw className="h-4 w-4" />
-        </Button>
-        {timer.isRunning ? (
-          <Button size="lg" className="w-32" onClick={timer.pause}>
-            <Pause className="h-5 w-5 mr-2" />
-            一時停止
-          </Button>
-        ) : (
-          <Button size="lg" className="w-32" onClick={timer.start}>
-            <Play className="h-5 w-5 mr-2" />
-            スタート
-          </Button>
-        )}
+        {/* タイマーリング */}
+        <TimerRing
+          timeLeft={timer.timeLeft}
+          progress={timer.progress}
+          mode={timer.mode}
+          isRunning={timer.isRunning}
+        />
+
+        {/* セッションドット */}
+        <div className="flex items-center gap-3">
+          <div className="flex gap-1.5">
+            {Array.from({ length: settings.longBreakInterval }, (_, i) => (
+              <span
+                key={i}
+                className={`inline-block h-1.5 w-1.5 rounded-full transition-colors ${
+                  i < timer.sessionCount % settings.longBreakInterval
+                    ? modeDotActive[timer.mode]
+                    : "bg-white/15"
+                }`}
+              />
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {timer.sessionCount} セッション完了
+          </span>
+        </div>
+
+        {/* 科目選択 */}
+        <Select value={subjectId} onValueChange={(v) => setSubjectId(v ?? "")}>
+          <SelectTrigger className="w-60 cursor-pointer">
+            <SelectValue placeholder="科目を選択（任意）" />
+          </SelectTrigger>
+          <SelectContent>
+            {subjects.map((s) => (
+              <SelectItem key={s.id} value={s.id} className="cursor-pointer">
+                <span className="mr-2">{s.icon}</span>
+                {s.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* コントロール */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={timer.reset}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/10 hover:text-foreground cursor-pointer"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </button>
+
+          {timer.isRunning ? (
+            <button
+              onClick={timer.pause}
+              className="flex h-14 w-36 items-center justify-center gap-2 rounded-full bg-white/10 border border-white/15 text-foreground font-medium transition-all hover:bg-white/15 cursor-pointer"
+            >
+              <Pause className="h-5 w-5" />
+              一時停止
+            </button>
+          ) : (
+            <button
+              onClick={timer.start}
+              className="flex h-14 w-36 items-center justify-center gap-2 rounded-full font-medium transition-all cursor-pointer text-white"
+              style={{
+                background: "linear-gradient(135deg, #6366f1, #818cf8)",
+                boxShadow: "0 0 24px rgba(99,102,241,0.4)",
+              }}
+            >
+              <Play className="h-5 w-5" />
+              スタート
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
