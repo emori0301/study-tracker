@@ -1,3 +1,23 @@
+import { Sidebar } from "@/components/layout/sidebar";
+import { BottomNav } from "@/components/layout/bottom-nav";
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <div className="flex min-h-screen">
+      {/* PC: サイドバー */}
+      <div className="hidden md:block">
+        <Sidebar />
+      </div>
+
+      {/* メインコンテンツ */}
+      <main className="flex-1 md:pl-14">
+        <div className="container max-w-5xl mx-auto px-4 py-6 pb-20 md:pb-6">
+          {children}
+        </div>
+      </main>
+
+      {/* モバイル: ボトムナビ */}
+      <BottomNav />
+    </div>
+  );
 }
