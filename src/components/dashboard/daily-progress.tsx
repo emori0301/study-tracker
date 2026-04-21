@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Timer } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 function fmt(min: number) {
   if (min < 60) return `${min}分`;
@@ -39,10 +40,10 @@ export function DailyProgress({ todayMinutes, goalMinutes }: DailyProgressProps)
           </div>
           <p className="text-xs text-muted-foreground mt-1 text-right">{pct}%</p>
         </div>
-        <Button className="w-full" render={<Link href="/timer" />}>
+        <Link href="/timer" className={cn(buttonVariants(), "w-full")}>
           <Timer className="h-4 w-4 mr-2" />
           タイマーを開始
-        </Button>
+        </Link>
       </CardContent>
     </Card>
   );
