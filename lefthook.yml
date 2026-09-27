@@ -1,0 +1,18 @@
+# コミット前に変更したファイルだけ整形・lint し、push 前に型を通す。
+# 秘密情報のチェックは ~/.config/git/hooks の共通 hook（gitleaks）が全リポジトリに掛けている。
+# node_modules が無い環境（依存未インストールの clone など）では飛ばす。
+
+pre-commit:
+  commands:
+    eslint:
+      glob: "*.{js,jsx,ts,tsx,mjs,cjs}"
+      skip:
+        - run: test ! -d node_modules
+      run: bunx eslint --no-warn-ignored {staged_files}
+
+pre-push:
+  commands:
+    typecheck:
+      skip:
+        - run: test ! -d node_modules
+      run: bunx tsc --noEmit
